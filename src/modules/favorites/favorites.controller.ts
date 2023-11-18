@@ -13,12 +13,12 @@ export class FavoritesController {
     }
 
     @Post("/:userId") 
-    createFavorite(@Param() userId, @Body() body) {
-        return this.appService.createFavorite(userId, body)
+    createFavorite(@Param() userId, @Body() productId) {
+        return this.appService.createFavorite(userId, productId)
     }
 
-    @Delete("/favorites/:productId")
-    deleteFavorite(@Param() productId) {
-        return this.appService.deleteFavorite(productId)
+    @Delete("/favorites/:id")
+    deleteFavorite(@Param() id) {  
+        return this.appService.deleteFavorite(id)
     }
 }

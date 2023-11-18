@@ -49,15 +49,16 @@ export class ProductsService {
         return this.productRepo.getProductDetail(id)
     }
 
-    async getNewarrival() {
-        const newarrival= await this.productRepo.getNewArrival()
-         const productNewArrival = []
-         for( let i=0; i < newarrival.length; i++) {
-            const product= await this.productRepo.getProductNewArrival(newarrival[i]?.id)
-            productNewArrival.push(product) 
-         }    
-         return productNewArrival
+    async getBestsellerl() {
+        return this.productRepo.getBestseller()
     }
+
+    async getProductsToExport() {
+        return this.productRepo.getProductsToExport()
+    }    
     
+    async getNewArrival() {
+        return this.productRepo.getNewArrival()
+    }
 
 }

@@ -33,7 +33,7 @@ export class Order {
     @ManyToOne(() => Address, (address) => address.order)
     address: Address
 
-    @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
+    @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
     orderItem: OrderItem[]
     
 }

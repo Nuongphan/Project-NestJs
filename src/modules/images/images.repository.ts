@@ -59,7 +59,7 @@ export class ImagesRepository {
 
             const uploadStream = cloudinary.uploader.upload_stream(
                 (error, result) => {
-
+                    
                     if (error) return reject(error);
 
                     this.imagesRepository.update(idImage, { imgSrc: result.secure_url })
@@ -69,8 +69,8 @@ export class ImagesRepository {
 
             streamifier.createReadStream(file.buffer).pipe(uploadStream);
 
-        });
-    }
+        });  
+    }   
 
     async deleteImageProduct(idProduct) {
         return await this.imagesRepository.delete({ productId: idProduct.idProduct })

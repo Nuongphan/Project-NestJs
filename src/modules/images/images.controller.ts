@@ -13,9 +13,7 @@ export class ImagesController {
         validators: [
             new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp)' })
         ]
-    })) file: Express.Multer.File[], @Body() body) {
-        console.log(file);
-        
+    })) file: Express.Multer.File[], @Body() body) {  
         return await this.imageService.uploadFiles(file, body);
     }
 

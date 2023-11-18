@@ -21,14 +21,11 @@ export class OrderItem {
     @Column("text")
     thumnail: string;
 
-    @Column('productId')
+    @Column()
     productId: number;
 
     @Column('orderId')
     orderId: number;
-
-    @ManyToOne(() => Products, (product) => product.cart)
-    product: Products
 
     @ManyToOne(() => Order, (order) => order.orderItem)
     order: Order; 

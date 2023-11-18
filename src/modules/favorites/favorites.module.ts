@@ -22,3 +22,4 @@ import { ProductRepository } from '../products/products.repositori';
   providers: [FavoritesService, FavoritesRepository, UserRepository, ProductRepository ]
 })
 export class FavoritesModule {}
+  

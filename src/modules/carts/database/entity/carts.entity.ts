@@ -11,14 +11,20 @@ export class Cart {
     @Column()
     quantity: number;
 
-    @Column('productId')
+    @Column()
     productId: number;
 
     @Column('userId')
     userId: number;
 
-    @ManyToOne(() => Products, (product) => product.cart)
-    product: Products
+    @Column()
+    thumbnailUrl: string;
+
+    @Column()
+    name: string;
+
+    @Column()
+    price: number;s
 
     @ManyToOne(() => Users, (user) => user.cart)
     user: Users; 

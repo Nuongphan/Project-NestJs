@@ -22,6 +22,11 @@ export class ProductsController {
         return   await this.appService.getProducts(page)
     }
 
+    @Get("/products/export")
+    async getProductsToExport() {
+        return   await this.appService.getProductsToExport()
+    }
+
     @Put("/update/:id") 
     updateProduct(@Param() id, @Body() body) {
         return this.appService.updateProduct(id, body)
@@ -32,9 +37,15 @@ export class ProductsController {
         return this.appService.getProductDetail(id)
     }
 
-    @Get("/newarrival/productnewarrival")
-    getNewarrival() {
-        const result = this.appService.getNewarrival()
+    @Get("/bestseller/productbestseller")
+    getBestsellerl() {
+        const result = this.appService.getBestsellerl()
+        return result
+    }
+
+    @Get("/products/newarrival/newarrivallist/")
+    getNewArrival() {
+        const result = this.appService.getNewArrival()
         return result
     }
 

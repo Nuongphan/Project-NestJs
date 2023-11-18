@@ -11,20 +11,14 @@ export class CartsRepository {
     async getCartByUser(idUser) {
 
         const userId = idUser.idUser
-        return this.cartRepository
-            .createQueryBuilder('cart')
-            .innerJoinAndSelect('cart.product', 'product')
-            .innerJoinAndSelect('product.category', 'category')
-            .innerJoinAndSelect('product.image', 'image')
-            .where('cart.userId = :userId', { userId })
-            .getMany();
+        return this.cartRepository.find({where: {userId:userId}})
 
     }
 
-    async productIncartUser(idUser, productId) {
+    async productIncartUser(idUser, body) {
 
         const userId = idUser.idUser;
-        const productIdd = productId.productId
+        const productIdd = body.id
         const result = await this.cartRepository.findOne({ where: { productId: productIdd, userId: userId } })
         return result
 
@@ -36,10 +30,9 @@ export class CartsRepository {
 
     }
     
-    async createCarts(body, idUser) {
-console.log(body, idUser);
+    async createCarts(body, idUser,idProduct,  name, price, image) {
 
-        return await this.cartRepository.save({ userId: idUser.idUser, quantity: body.quantity, productId: body.productId })
+        return await this.cartRepository.save({ userId: idUser.idUser, quantity: body.quantity, productId:idProduct, name:name,  price:price, thumbnailUrl:image})
    
     }
 

@@ -15,39 +15,35 @@ export class OrdersRepository {
         @InjectRepository(Cart) private cartRepository: Repository<Cart>,
         @InjectRepository(Products) private productsRepository: Repository<Products>,
         @InjectRepository(OrderItem) private orderItemRepository: Repository<OrderItem>) { }
-     
+
     async getAllOrders() {
         return this.orderRepository.find()
     }
 
     async getProductBestsellers(id) {
         return await this.productsRepository.find({
-            relations: ['image', 'category'], 
-            where: {id: id}
+            relations: ['image', 'category'],
+            where: { id: id }
         })
     }
 
     async getOrderByUserId(userId) {
-        return this.orderRepository.findBy({ userId: userId.userId })
+        return this.orderRepository.find({ where: { userId: userId.userId }, order: { id: 'DESC' } })
     }
 
     async productInCart(userId) {
         const idUser = userId.userId
-        const result = await this.cartRepository
-            .createQueryBuilder('cart')
-            .innerJoinAndSelect('cart.product', 'product')
-            .innerJoinAndSelect('product.image', 'image')
-            .where('cart.userId = :userId', { userId: idUser })
-            .getMany();
+        const result = await this.cartRepository.find({ where: { userId: idUser } })
+
         return result
     }
 
     async createNewOrder(totalAmount, userId, addressUserId) {
-       return  await this.orderRepository.save({ userId: userId, totalAmount: totalAmount, addressId: addressUserId, shippingFee: 25000, orderDate: new Date() })
+        return await this.orderRepository.save({ userId: userId, totalAmount: totalAmount, addressId: addressUserId, shippingFee: 25000, orderDate: new Date() })
     }
 
-    async updateProduct(productId, updatedQuantityStock) {
-        await this.productsRepository.update(productId, { stock: updatedQuantityStock })
+    async updateProduct(productId, updatedQuantityStock, updateBestseller) {
+        await this.productsRepository.update(productId, { stock: updatedQuantityStock, bestseller: updateBestseller })
     }
 
     async findAdressUserId(userId) {
@@ -58,42 +54,35 @@ export class OrdersRepository {
         return await this.cartRepository.findBy({ userId: userId.userId })
     }
 
-    async createOrderItem(quantityy, name, price, id, image ,orderId) {
-        const thumnail= image.imgSrc
-        const result= await this.orderItemRepository.save({quantity:quantityy,productName: name, price: price, orderId: orderId, productId:id, thumnail:thumnail})
-       
+    async createOrderItem(quantityy, name, price, id, image, orderId) {
+        const result = await this.orderItemRepository.save({ quantity: quantityy, productName: name, price: price, orderId: orderId, productId: id, thumnail: image })
+
     }
 
     async deleteCart(userId) {
-      return   await this.cartRepository.delete({userId: userId.userId})
-    } 
+        return await this.cartRepository.delete({ userId: userId.userId })
+    }
 
     async getorder(param) {
-        return await this.orderRepository.findOne({where: {id: param}})
-    } 
+        return await this.orderRepository.findOne({ where: { id: param } })
+    }
 
     async changeStatus(param, body) {
-        return await this.orderRepository.update(param, {status:body})
+        return await this.orderRepository.update(param, { status: body })
     }
 
     async cancelOrder(id) {
-        return await this.orderRepository.update(id, {status: "Cancelled"})
+        return await this.orderRepository.update(id, { status: "Cancelled" })
     }
-    
+
     async getOrderDetails(id) {
-        const orderDetails = await this.orderItemRepository.find({where: {orderId: id.id}})
+        const orderDetails = await this.orderItemRepository.find({ where: { orderId: id.id } })
         return orderDetails
     }
 
-    async getBestsellers() {
-        return await this.orderItemRepository
-        .createQueryBuilder('orderitems')
-        .select('orderitems.productId', 'productId')
-        .addSelect('SUM(orderitems.quantity)', 'quantity')
-        .groupBy('orderitems.productId')
-        .orderBy('SUM(orderitems.quantity)', 'DESC')
-        .limit(10)
-        .getRawMany();
+    async getOrderItems(id) {
+        const orderDetails = await this.orderItemRepository.find({ where: { orderId: id } })
+        return orderDetails
     }
 
     async totalOrder() {
@@ -101,18 +90,30 @@ export class OrdersRepository {
     }
 
     async getOrderWithLimit(skip, pageSize, totalPage) {
-        const result= await this.orderRepository.find({ skip: skip, take: pageSize, })
-        return {result, totalPage}
+        const result = await this.orderRepository.find({ skip: skip, take: pageSize, })
+        return { result, totalPage }
     }
 
     async getOrderById(id) {
-        return this.orderRepository.findOne({where: {id: id}})
+        return this.orderRepository.findOne({ where: { id: id } })
     }
 
     async getOrderWithOrderDate() {
         return this.orderRepository
-        .createQueryBuilder("orders")
-        .orderBy("orders.orderDate", "DESC")
-        .getMany();
+            .createQueryBuilder("orders")
+            .orderBy("orders.orderDate", "DESC")
+            .getMany();
+    }
+
+    async getOrder(id) {
+        return this.orderRepository.findOne({ where: { id: id } })
+    }
+
+    async quantityUpdateProduct(product, id) {
+        return this.productsRepository.update(id, product)
+    }
+
+    async getProduct(id) {
+        return this.productsRepository.findOne({ where: { id: id } })
     }
 }

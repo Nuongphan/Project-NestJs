@@ -1,29 +1,29 @@
-import { Injectable, Param } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { OrdersRepository } from './orders.repository';
 import { MailService } from '../mail/mail.service';
-import { UserRepository } from '../users/users.repository';
+import { UserRepository } from '../users/users.repository';  
+import { ProductRepository } from '../products/products.repositori';
+
 
 @Injectable()
 export class OrdersService {
 
     constructor(private readonly orderRepo: OrdersRepository, private mailService: MailService,
-        private readonly userRepo: UserRepository) { }
+        private readonly userRepo: UserRepository, private readonly productRepo: ProductRepository) { }
 
     async getAllOrders(page) {
-        console.log(page);
-        
-        if(page.page) {
-            let pagee= parseInt(page.page)   
-            const pageSize= 12
-            const totalOrder= await this.orderRepo.totalOrder();
-            const totalPage= Math.ceil(totalOrder/pageSize)
-            const skip= (pagee-1)*pageSize
-            if(pagee<0) {
-              pagee=1
+        if (page.page) {
+            let pagee = parseInt(page.page)
+            const pageSize = 12
+            const totalOrder = await this.orderRepo.totalOrder();
+            const totalPage = Math.ceil(totalOrder / pageSize)
+            const skip = (pagee - 1) * pageSize
+            if (pagee < 0) {
+                pagee = 1
             }
-           return  await this.orderRepo.getOrderWithLimit(skip, pageSize, totalPage)
-          
-          }
+            return await this.orderRepo.getOrderWithLimit(skip, pageSize, totalPage)
+
+        }
         return await this.orderRepo.getAllOrders()
     }
 
@@ -47,7 +47,7 @@ export class OrdersService {
 
         const productInCart = await this.orderRepo.productInCart(userId)
         const totalAmount = productInCart
-            .map(item => item.quantity * item.product.price) // Tính giá tiền cho mỗi sản phẩm
+            .map(item => item.quantity * item.price) // Tính giá tiền cho mỗi sản phẩm
             .reduce((acc, curr) => acc + curr, 0)
 
         // Điều kiện check xem đơn hàng đã có chưua
@@ -55,11 +55,16 @@ export class OrdersService {
         let orderId;
         let order
         for (const cartProduct of productInCart) {
-            const product = cartProduct.product
-            const updatedQuantityStock =
-                Number(product.stock) - Number(cartProduct.quantity);
-
-            //Tạo đơn hàng nếu chưa có 
+            const product = await this.productRepo.getProductDetaill(cartProduct)
+            console.log("product", product);
+            if (product?.length == 0) {
+                console.log(cartProduct.name, 'ahihi đồ ngốc');
+                return { msg: "Product out of stock", data: cartProduct.name, success: false }
+            }
+            const updatedQuantityStock = Number(product?.[0]?.stock) - Number(cartProduct.quantity);
+            let updateBestseller = 0
+            updateBestseller += Number(cartProduct.quantity);
+            //Tạo đơn hàng nếu chưa có   
             if (hasCreatedNewOrder === false) {
                 const newOrder = await this.orderRepo.createNewOrder(totalAmount, userId.userId, addressUserId?.[0].id);
                 order = newOrder
@@ -68,10 +73,10 @@ export class OrdersService {
             }
 
             // Cập nhật số lượng tồn kho trong bảng products
-            await this.orderRepo.updateProduct(cartProduct?.productId, updatedQuantityStock)
+            await this.orderRepo.updateProduct(cartProduct?.productId, updatedQuantityStock, updateBestseller)
 
             //  Tạo orderItem
-            await this.orderRepo.createOrderItem(cartProduct?.quantity, product?.name, product?.price, product?.id, product?.image?.[0], orderId)
+            await this.orderRepo.createOrderItem(cartProduct?.quantity, cartProduct?.name, cartProduct?.price, cartProduct?.productId, cartProduct?.thumbnailUrl, orderId)
 
         }
         const user = await this.userRepo.getUserInfor(userId)
@@ -96,7 +101,22 @@ export class OrdersService {
     }
 
     async cancelOrder(id) {
+        const order = await this.orderRepo.getOrder(id.id)
+        const orderItem = await this.orderRepo.getOrderItems(order.id)
+        for (const orderItemInOrder of orderItem) {
+            const product = await this.orderRepo.getProduct(orderItemInOrder?.productId);
+            if (product) {
+                product.stock += orderItemInOrder.quantity;
+                product.bestseller -= orderItemInOrder.quantity
+                await this.orderRepo.quantityUpdateProduct(product, orderItemInOrder?.productId)
+            }
+        }
+        if (!order) {
+            return { msg: "Order not found" }
+        }
         return await this.orderRepo.cancelOrder(id.id)
+
+
     }
 
     async getOrderDetails(id) {
@@ -107,20 +127,11 @@ export class OrdersService {
         return await this.orderRepo.getOrderDetails(id)
     }
 
-    async getBestsellers() {
-         const bestsellers= await this.orderRepo.getBestsellers() 
-         const productBestsellers = []
-         for( let i=0; i < bestsellers.length; i++) {
-            const product= await this.orderRepo.getProductBestsellers(bestsellers[i]?.productId)
-            productBestsellers.push(product) 
-         }    
-         return productBestsellers
-    }
 
     async getOrderById(id) {
         return await this.orderRepo.getOrderById(id.id)
     }
-    
+
     async getOrderWithOrderDate() {
         return await this.orderRepo.getOrderWithOrderDate()
     }

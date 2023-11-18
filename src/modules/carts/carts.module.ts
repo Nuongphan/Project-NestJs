@@ -14,11 +14,12 @@ import { VerifyEmail } from '../verifyemail/database/entity/verifyEmail.entity';
 import { Roles } from '../roles/database/entity/roles.entity';
 import { ResetEmail } from '../reset-password/database/entity/resetpassword.entity';
 import { Address } from '../addresses/database/entity/addresses.entity';
+import { ProductRepository } from '../products/products.repositori';
 
 
 @Module({
   imports: [TypeOrmModule.forFeature( [Cart, Products, Users, VerifyEmail, Roles,ResetEmail, Address]), JwtModule], 
   controllers: [CartsController],
-  providers: [CartsService, CartsRepository,AuthGuard,RolesGuard,UserRepository ]
+  providers: [CartsService, CartsRepository,AuthGuard,RolesGuard,UserRepository, ProductRepository ]
 })
 export class CartsModule {}

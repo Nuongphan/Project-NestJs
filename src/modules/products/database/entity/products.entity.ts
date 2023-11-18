@@ -25,7 +25,12 @@ export class Products {
     @Column('categoryId')
     categoryId: number;
 
+    @Column({default:false})
+    isDelete: boolean;
 
+    @Column({default:0})
+    bestseller: number;
+  
     @ManyToOne(() => Category, (category)=> category.product )
     category: Category
 
@@ -35,7 +40,5 @@ export class Products {
     @OneToMany(()=> Images, (image)=> image.product, {cascade: true} )
     image: Images[]
     
-    @OneToMany(()=> Cart, (cart)=> cart.product, {cascade: true} )
-    cart: Cart[]
     
 }

@@ -46,13 +46,7 @@ export class OrdersController {
         return this.appService.getOrderDetails(id)
     }
 
-    @Get("/orderitem/bestsellers")
-    async getBestsellers() {
-        const result = await this.appService.getBestsellers()
-        console.log(result);
-        
-        return result
-    }
+  
 
 
 }

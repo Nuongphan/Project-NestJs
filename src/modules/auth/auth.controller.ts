@@ -8,7 +8,6 @@ import { GoogleAuthGuard } from './guard/googleAuth.guard';
 export class AuthController {
 
     constructor(private readonly authService: AuthService) { }
-
     
     @Get('/google')
     @UseGuards(AuthGuard('google'))
@@ -23,21 +22,8 @@ export class AuthController {
     return response.redirect(`http://localhost:3000/auth/logingoogle/${request.user.tokenUser}/${JSON.stringify(request.user.user[0].id)}/${JSON.stringify(request.user.user[0].status)}/${JSON.stringify(request.user.user[0].firstName)}/${JSON.stringify(request.user.user[0].lastName)}`)
     }
 
-    @Get('/facebook')
-    @UseGuards(AuthGuard('facebook'))
-    handleLoginFaceBook() {
-      return { msg: 'FaceBook Authentication' };
-    }                                
-
-    @Get('/facebook/callback')
-    @UseGuards(AuthGuard('facebook') )
-    handleRedirectFaceBook(@Req() request, @Res() response) {
-      request.headers['Authorization'] = `Bearer ${request.user.tokenUser}`; 
-      console.log(request.user);
-      
-    return response.redirect(`http://localhost:3000/auth/loginfacebook/${request.user.tokenUser}/${JSON.stringify(request.user.user[0].id)}/${JSON.stringify(request.user.user[0].status)}/${JSON.stringify(request.user.user[0].firstName)}/${JSON.stringify(request.user.user[0].lastName)}`)
-    }
-   
+  
+  
     
     @Post()
     async login(@Body() body: LoginUserDTO) {

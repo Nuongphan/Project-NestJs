@@ -85,13 +85,14 @@ export class UserRepository {
 
     async sendForgotpassword(user, randomString) {
        const result= await this.resetemailRepository.save({ userId: user.id, code: randomString })
-       const deletee = await this.resetemailRepository.delete({ userId: user.id})
        return result
     }
 
     async sendResetpassword(codeRessetDatabase, newPassword) {
         const id = codeRessetDatabase.userId
-        return await this.userRepository.update(id, { password: newPassword })
+        const result= await this.userRepository.update(id, { password: newPassword })
+        const deletee = await this.resetemailRepository.delete({userId:id })
+        return result
     }
 
     async getCodeReset(code) {

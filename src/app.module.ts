@@ -19,19 +19,19 @@ import { PassportModule } from '@nestjs/passport';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { MulterModule } from '@nestjs/platform-express/multer';
 import { UploadMiddleware } from './middlewares/upload.middleware';
-import { CsvController } from './modules/csv/csv.controller';
-import { CsvService } from './modules/csv/csv.service';
+import { Csv1Module } from './modules/csv1/csv1.module';
+
+
+
 require("dotenv").config()
 
 @Module({ 
   imports: [
     TypeOrmModule.forRoot(Config), ConfigModule.forRoot({isGlobal: true}),  PassportModule.register({ session: true }), UsersModule, RolesModule, MailModule, 
     VerifyemailModule,ResetPasswordModule, ProductsModule,AuthModule,ImagesModule, CartsModule, OrderItemModule, OrdersModule, FavoritesModule,  MulterModule.registerAsync({
-      useClass: UploadMiddleware,
-    }),
-  ],
-  controllers: [AppController, CsvController],
-  providers: [AppService, CsvService], 
+      useClass: UploadMiddleware }),Csv1Module ],
+  controllers: [AppController],
+  providers: [AppService], 
   
 })
 
